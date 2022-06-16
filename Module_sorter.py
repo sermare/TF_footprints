@@ -36,29 +36,37 @@ def closest(list1, list2, k):
 
 ### Loading the chromosomes
 
-chromosomes = ['chr1', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
+chromosomes = ['chr1', 'chrY', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
        'chr16', 'chr17', 'chr18', 'chr19', 'chr2', 'chr20', 'chr21',
        'chr22', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
-       'chrX', 'chrY']  
+       'chrX']  
+
+## Where the magic happens
 
 for chromosome in chromosomes:
 
-    tmp_modules = modules[modules.chr == chromosome]
-    tmp_modules = tmp_modules.reset_index()
+    try:
+        tmp_modules = modules[modules.chr == chromosome]
+        tmp_modules = tmp_modules.reset_index()
 
-    tmp_tf_footprints = footprint[footprint.Chr == chromosome]
-    tmp_tf_footprints = tmp_tf_footprints.reset_index()
+        tmp_tf_footprints = footprint[footprint.Chr == chromosome]
+        tmp_tf_footprints = tmp_tf_footprints.reset_index()
 
-    for i, y in enumerate(tmp_tf_footprints['tf_c1']):
-        x1 = closest(tmp_modules['start'], tmp_tf_footprints['tf_c1'], i)
-        x2 = tmp_modules[tmp_modules['start'] == x1]['end'].iloc[-1]
+        for i, y in enumerate(tmp_tf_footprints['tf_c1']):
+            x1 = closest(tmp_modules['start'], tmp_tf_footprints['tf_c1'], i)
+            x2 = tmp_modules[tmp_modules['start'] == x1]['end'].iloc[-1]
 
-        if (x1 < y < x2):
-            pass
-           # tmp_tf_footprints['Unnamed: 9'][i] = tmp_modules[tmp_modules['start'] == x1]['Module'].iloc[-1]
-    
-    print('fucking done with', chromosome)
+            if (x1 < y < x2):
+                tmp_tf_footprints['Unnamed: 9'][i] = tmp_modules[tmp_modules['start'] == x1]['Module'].iloc[-1]
 
+        if chromosome == 'chr1':
+            out_csv = tmp_tf_footprints
+        else:
+            out_csv = pd.concat([out_csv, tmp_tf_footprints])
+    except:
+        pass
+
+out_csv.to_csv('output.tsv')
 
 ### Time it for fun
 end = time.time()
