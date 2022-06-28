@@ -4,12 +4,17 @@ import os
 import glob
 import time
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 def closest(list1, list2, k):
     return(list1[np.abs(list1 - list2[k]).argmin()])
 
 def get_values(files):
+
     for file in files:
         ### Loading the chromosomes
+        start = time.time()
+        print('working on ', file)
 
         footprint = pd.read_csv(file, "\t")
         footprint = footprint.sort_values(by ="Chr")
@@ -41,7 +46,7 @@ def get_values(files):
                     x2 = tmp_modules[tmp_modules['start'] == x1]['end'].iloc[-1]
 
                     if (x1 < y < x2):
-                        tmp_tf_footprints['Unnamed: 9'][i] = tmp_modules[tmp_modules['start'] == x1]['Genes'].iloc[-1]
+                        tmp_tf_footprints['Unnamed: 9'][i] = tmp_modules[tmp_modules['start'] == x1]['Peak'].iloc[-1]
                         tmp_tf_footprints['num'][i] = tmp_modules[tmp_modules['start'] == x1]['Module'].iloc[-1]
 
                 if chromosome == 'chr1':
@@ -57,13 +62,12 @@ def get_values(files):
         end = time.time()
         print(end - start)
 
-start = time.time()
-
 cur_dir = os.getcwd()
 entries = os.listdir(cur_dir)
 
-print("Found %s entries in %s" % (len(entries), cur_dir))
-print('-' * 10)
+
+#print("Found %s entries in %s" % (len(entries), cur_dir)) 
+#print('-' * 10)
 
 path = "./"
 extension_csv = 'csv'
@@ -82,7 +86,7 @@ if(loader == 'A'):
 # Automatically Load the filess
     # Result_2 files will be changing but I will done that later (a lot of filess will be inputted)
     result_2 = glob.glob('*.{}'.format(extension_txt))
-    print(result_2)
+    #print(result_2)
     get_values(result_2)
 elif(loader == 'M'):
     result_2 = [input()]
